@@ -8,22 +8,22 @@ import matplotlib.pyplot as plt
 rootdir = '/Users/Brendan/Dropbox/Brendan/Veloce/Data/veloce/'
 
 def read_and_overscan_correct(infile, overscan=53, discard_ramp=17, 
-    savefile=False, return_overscan=False, ian_price_convention=True):
+    savefile=False, return_overscan=False, ian_price_convention=True, dtype=np.float32):
     """Read in fits file and overscan correct. Assume that
     the overscan region is indepedent of binning."""
     dd = pyfits.getdata(infile)
     newshape = (dd.shape[0], dd.shape[1]-2*overscan)
     quadshape = (4,newshape[0]//2, newshape[1]//2)
-    quads = np.zeros(quadshape)
-    corrected = np.zeros(newshape)
-    overscans = np.zeros( (4,dd.shape[0]//2, overscan))
+    quads = np.zeros(quadshape, dtype)
+    corrected = np.zeros(newshape, dtype)
+    overscans = np.zeros( (4,dd.shape[0]//2, overscan), dtype)
     
     #Split the y axis in 2
     for y0, y1, qix in zip([0, dd.shape[0]//2], [dd.shape[0]//2, dd.shape[0]], [0,2]):
         #Deal with left quadrant
         overscans[qix] = dd[y0:y1,:overscan]
         overscan_ramp = np.median(overscans[qix] + \
-            np.random.random(size=overscans[qix].shape) - 0.5, axis=0)
+            np.random.random(size=overscans[qix].shape).astype(dtype) - 0.5, axis=0)
         overscan_ramp -= overscan_ramp[-1] 
         for i in range(len(overscans[qix])):
             overscans[qix,i] = overscans[qix, i] - overscan_ramp

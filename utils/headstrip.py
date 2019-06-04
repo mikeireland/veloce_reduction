@@ -5,6 +5,7 @@ import glob
 import os
 
 fnames = glob.glob('/Users/mireland/data/veloce/180920/ccd_3/[0123]*fits')
+fnames = glob.glob('/Users/mireland/data/veloce/180919/ccd_3/[0123]*fits')
 fnames.sort()
 for f in fnames:
     header = pyfits.getheader(f)

@@ -1,3 +1,5 @@
+"""A series of routines to fit peaks to LFC lines"""
+
 from __future__ import division, print_function
 import astropy.io.fits as pyfits
 import numpy as np
@@ -28,19 +30,24 @@ def default_badpix():
     return badpix
     
 def get_median_frame(files):
-    """Lets get a nice median frame to remove cosmics etc"""
+    """Return a nice median frame to remove cosmics etc. This is very useful for initial
+    identification of the LFS lines"""
     cube = []
     for f in files:
         cube.append(so.read_and_overscan_correct(f))
     return np.median(np.array(cube), axis=0)
 
 def get_cutouts(frame, peaks, sz=5):
+    """Cutout small NxN pixel arrays for fitting to.
+    """
     cutouts = np.empty( (len(peaks),sz,sz) )
     for ix, xy in enumerate(peaks):
         cutouts[ix] = frame[xy[0]-sz//2:xy[0]+sz//2+1, xy[1]-sz//2:xy[1]+sz//2+1]
     return cutouts
 
 def simple_centroids(cutouts):
+    """Compute simplistic centroids for a series of cutouts from a frame.
+    """
     sz = cutouts.shape[1]
     xy = np.meshgrid(np.arange(-(sz//2),sz//2+1), np.arange(-(sz//2),sz//2+1))
     n_pk = cutouts.shape[0]
@@ -53,6 +60,9 @@ def simple_centroids(cutouts):
     return xc, yc, fluxes
 
 def centroid_diff():
+    """Based on two set of LFC line centroids, compute the pattern of centroid shifts
+    in a way that is independent of outliers as much as possible.
+    """
     return    
 
 if __name__=="__main__":
